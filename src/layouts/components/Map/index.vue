@@ -96,107 +96,8 @@ async function initMap() {
         })
         ;
 
-    //====
-
-
-    // const imageUrl = image;
-    // const getImageBytes = async () => {
-    //     const response = await fetch(imageUrl);
-    //     const buffer = await response.arrayBuffer();
-    //     const bytes = new Uint8Array(buffer);
-    //     console.log(bytes); // 输出二进制字节
-    //     const SQL = await initSqlJs({
-    //         // Required to load the wasm binary asynchronously. Of course, you can host it wherever you want
-    //         // You can omit locateFile completely when running in node
-    //         locateFile: file => `https://sql.js.org/dist/sql-wasm.wasm`
-    //     });
-    //     // 创建 XMLHttpRequest 对象并请求 SQLite 数据库文件
-    //     var xhr = new XMLHttpRequest();
-    //     xhr.open('GET', '/src/assets/identifier2.sqlite', true);
-    //     xhr.responseType = 'arraybuffer';
-    //     xhr.onload = function (e) {
-    //         var uInt8Array = new Uint8Array(this.response);
-    //         // 打开 SQLite 数据库文件
-    //         var db = new SQL.Database(uInt8Array);
-    //         // 查询数据
-
-    //         // db.run("INSERT INTO table_name1 (col_num, tile_file_name, tile_origin_path, tile_blob_data) VALUES (2, 2, 2, '${bytes}');");
-    //         // db.run("INSERT INTO table_name1  VALUES (2, 2, 2, '${bytes}');");
-    //         console.log(`run insert`);
-    //         // var res = db.exec("SELECT * FROM table_name1")
-    //         var res = db.exec("SELECT * FROM Images2")
-    //         console.log("res", res);
-    //         var res = db.exec("SELECT image FROM Images2 WHERE zpath = 10 AND xpath = 740 AND ypath = '520.jpg'")
-    //         // var res = db.exec("SELECT ypath FROM Images2 WHERE zpath = 10 AND xpath = 740 AND ypath = '520.jpg'")
-    //         // 处理查询结果
-    //         console.log("res", res);
-    //     };
-    //     xhr.send();
-
-    // };
-
-    // getImageBytes();
-
-
-    //=====
-
-    // const SQL = await initSqlJs({
-    //         // Required to load the wasm binary asynchronously. Of course, you can host it wherever you want
-    //         // You can omit locateFile completely when running in node
-    //         locateFile: file => `https://sql.js.org/dist/sql-wasm.wasm`
-    //     });
-
-    // // 加载数据库文件
-    // const xhr = new XMLHttpRequest();
-    // xhr.open('GET', '/src/assets/identifier2.sqlite', true);
-    // xhr.responseType = 'arraybuffer';
-    // xhr.onload = async function () {
-    //     const data = new Uint8Array(xhr.response);
-    //     const db = new SQL.Database(data);
-
-    //     // 读取瓦片图像数据
-    //     const stmt = db.prepare('SELECT image FROM Images2 WHERE zpath = :z AND xpath = :x AND ypath = :y');
-    //     const tilePromise = (z, x, y) => new Promise((resolve, reject) => {
-    //         const tile = L.tileLayer('');
-
-    //         stmt.getAsObject({ ':z': z, ':x': x, ':y': y }, row => {
-    //             console.log(`findinter`, z,x,y);
-    //             if (row && row.data) {
-
-    //                 // 将 Blob 数据转换为 Base64 字符串
-    //                 const blob = new Blob([row.data], { type: 'image/png' });
-    //                 const reader = new FileReader();
-    //                 reader.onload = function () {
-    //                     const url = reader.result;
-    //                     tile.setUrl(url);
-    //                     resolve(tile);
-    //                 }
-    //                 reader.onerror = function () {
-    //                     reject(reader.error);
-    //                 }
-    //                 reader.readAsDataURL(blob);
-    //             } else {
-    //                 resolve(null);
-    //             }
-    //         });
-    //     });
-
-    //     // 创建地图并加载瓦片图层
-
-    //     // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-    //     L.tileLayer('penstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-    //     const tiles = L.gridLayer({ tileSize: 256, updateWhenIdle: true });
-    //     tiles.createTile = function (coords) {
-    //         return tilePromise(coords.z, coords.x, coords.y);
-    //     }
-    //     tiles.addTo(map);
-    // }
-    // xhr.send();
-
-    //========
     var MyGridLayer = L.GridLayer.extend({
         createTile: function (coords) {
-
             // 创建一个用于绘图的 <canvas> 元素
             var tile = L.DomUtil.create('canvas', 'leaflet-tile');
 
@@ -211,14 +112,6 @@ async function initMap() {
             // 根据 xyz 坐标从数据库中获取 blob 数据
             getBlobFromDatabase(coords.z, coords.x, coords.y).then(function (blob) {
 
-                // // 将 blob 数据转换成 URL，用于替换瓦片的 src
-                // console.log('blob', blob);
-                // let binaryData = [];
-                // binaryData.push(blob);
-                // var url = window.URL.createObjectURL(new Blob(binaryData));
-                // // var url = URL.createObjectURL(blob);
-                // const blobImg = new Blob([blob], { type: 'image/png' });
-                // tile.src = URL.createObjectURL(blobImg);
                 var ctx = tile.getContext('2d');
                 const img = new Image();
                 img.src = blob;
@@ -230,14 +123,6 @@ async function initMap() {
                 console.log(`thenfinish`);
             });
 
-            // var ctx = tile.getContext('2d');
-            // const img = new Image();
-            // img.src = exampleImg;
-            // img.onload = function () {
-            //     ctx.width = tile.width;
-            //     ctx.height = tile.height;
-            //     ctx.drawImage(img, 0, 0);
-            // }
             return tile;
         }
     });
@@ -260,25 +145,13 @@ async function initMap() {
         // Open the SQLite database file
         const uInt8Array = new Uint8Array(await (await fetch('/src/assets/identifier2.sqlite')).arrayBuffer());
         const db = new SQL.Database(uInt8Array);
-
-        // const stmt = db.prepare('SELECT image FROM Images2 WHERE zpath = ? AND xpath = ? AND ypath = ?');
         var sqlstat = "SELECT image FROM Images2 WHERE zpath = " + z + " AND xpath = " + x + " AND ypath = '" + y + ".jpg'";
         const stmt = db.exec(sqlstat);
-        // const result = stmt.getAsObject({':zval' : z, ':xval' : x,'yval':y+'.jpg'});
-        // console.log(`result`,result);
-        // const stmt = db.prepare('SELECT ypath FROM Images2 WHERE zpath = ? AND xpath = ? AND ypath = ?');
-        // const stmt = db.prepare("SELECT ypath FROM Images2 WHERE zpath = 10 AND xpath = 740 AND ypath = '520.jpg'");
-        console.log(`zxy`,z,x,y);
-        // stmt.bind([z, x, y]);
-        // var stmt = db.exec("SELECT image FROM Images2 WHERE zpath = 10 AND xpath = 740 AND ypath = '425.jpg'")
-        // var res = db.exec("SELECT ypath FROM Images2 WHERE zpath = 10 AND xpath = 740 AND ypath = '520.jpg'")
-        // console.log(`res`, res);
-        // const row = stmt.get();
-        // stmt.get();
-        console.log(`stmt`,stmt);
+        console.log(`zxy`, z, x, y);
+
+        console.log(`stmt`, stmt);
         const blobData = stmt[0].values[0][0];
         console.log(`blobData`, blobData);
-        readBlobToImg(blobData);
         // Return the blob data as a Promise
         return new Promise(resolve => {
             const blob = new Blob([blobData], { type: 'image/jpeg' });
@@ -287,37 +160,9 @@ async function initMap() {
                 const result = reader.result;
                 resolve(result);
             };
-            reader.readAsDataURL(blob);
-            // stmt.free()
+            reader.readAsDataURL(blob);//读取为Base64格式
         });
-
     }
-
-}
-
-// let imageData = null;
-
-// const reader = new FileReader();
-
-// reader.onload = (event) => {
-//     imageData = event.target.result;
-// };
-
-// reader.onerror = (event) => {
-//     console.error('Failed to load image', event);
-// };
-
-// const saveImage = () => {
-//     console.log(`blobImg`, blobImg);
-//     const blob = new Blob([blobImg], { type: 'image/jpeg' });
-//     reader.readAsArrayBuffer(blob);
-// };
-
-function readBlobToImg(blobData) {
-    // console.log(`exampleImg`, exampleImg);
-    // var imgSrc = exampleImg;
-    console.log(`blobData`, blobData);
-    blobImg = blobData;
 }
 
 </script>
