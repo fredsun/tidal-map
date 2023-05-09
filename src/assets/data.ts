@@ -1,4 +1,4 @@
-var bicycleRental = {
+const bicycleRental = {
     "type": "FeatureConllection",
     "features": [
         {
@@ -135,3 +135,5 @@ var bicycleRental = {
         }
     ]
 }
+
+export default bicycleRental;

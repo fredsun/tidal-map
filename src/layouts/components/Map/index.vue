@@ -1,8 +1,7 @@
 <template>
     <div id='myMap' class="mainMap"></div>
     <el-form-item label="头像" prop="pass">
-        <img v-bind:src="imageData" style="width: 100px;">
-        <button @click="saveImage">Save Image</button>
+      
     </el-form-item>
 </template>
 <script setup lang="ts">
@@ -37,19 +36,24 @@ async function initMap() {
         "天地图矢量": vecLayerGroup,
         "天地图影像": imgLayerGroup
     };
-    var localLayer = vecLayer;
-    // var localLayer = L.tileLayer('Z:/era/map_sea/shipxy/terrain/{z}/{x}/{y}.jpg');
-    // var localLayer = L.tileLayer('src/assets/map_sea/shipxy/terrain/{z}/{x}/{y}.jpg');
+    // const tidalLayer = L.tileLayer(`http://localhost:8080/TestJava_war_exploded/WebGISHandler?x={x}&y={y}&z={z}`);
 
-    let centerLatlng = [-2.811371, 80.15625];
+    const tidalLayer = L.tileLayer(`http://127.0.0.1:8000/tidal_map/get_tidal?x={x}&y={y}&z={z}`);
+    // const tidalLayer = L.tileLayer(`http://localhost:5000/getTidal?x={x}&y={y}&z={z}`);
+    // const tidalLayer = L.tileLayer(`http://localhost:5000/get_tidal?x={x}&y={y}&z={z}`);
+    // var localLayer = L.tileLayer('Z:/era/map_sea/shipxy/terrain/{z}/{x}/{y}.jpg');
+    // var localLayer = L.tileLayer('src/assets/map_sea/shipxy/nterrain/{z}/{x}/{y}.jpg');
+
+    const centerLatlng = L.latLng(-2.811371, 80.15625);
     map = L.map('myMap', {  //需绑定地图容器div的id
         center: [-2.811371, 80.15625], //初始地图中心 lat, lng
         zoom: 10, //初始缩放等级
         maxZoom: 18, //最大缩放等级
-        minZoom: 0, //最小缩放等级
+        minZoom: 1, //最小缩放等级
         zoomControl: false,//不显示缩放小控件
-        layers: localLayer
+
     });
+    tidalLayer.addTo(map);
     var popup = L.popup({
         keepInView: true,
         closeButton: false,
@@ -70,7 +74,8 @@ async function initMap() {
         .bindPopup(popupContent)
         .on('popupopen', function (e) {
 
-            var myChart = echarts.init(document.getElementById(idStr));
+            // 补充非空断言 '!'
+            var myChart = echarts.init(document.getElementById(idStr)!);
             // 指定图表的配置项和数据
             var option = {
                 title: {
@@ -97,7 +102,7 @@ async function initMap() {
         ;
 
     var MyGridLayer = L.GridLayer.extend({
-        createTile: function (coords) {
+        createTile: function (coords: any) {
             // 创建一个用于绘图的 <canvas> 元素
             var tile = L.DomUtil.create('canvas', 'leaflet-tile');
 
@@ -112,12 +117,12 @@ async function initMap() {
             // 根据 xyz 坐标从数据库中获取 blob 数据
             getBlobFromDatabase(coords.z, coords.x, coords.y).then(function (blob) {
 
-                var ctx = tile.getContext('2d');
+                var ctx = tile.getContext('2d')!;
                 const img = new Image();
-                img.src = blob;
+                img.src = URL.createObjectURL(blob as Blob);
                 img.onload = function () {
-                    ctx.width = tile.width;
-                    ctx.height = tile.height;
+                    // ctx.width = tile.width;
+                    // ctx.height = tile.height;
                     ctx.drawImage(img, 0, 0);
                 }
                 console.log(`thenfinish`);
@@ -128,13 +133,16 @@ async function initMap() {
     });
 
     // 创建自定义瓦片图层实例，并添加到地图上
-    const myGridLayer = new MyGridLayer();
-    myGridLayer.addTo(map);
-    cvaLayer.addTo(map);
+    // const myGridLayer = new MyGridLayer();
+    // myGridLayer.addTo(map);
+    // cvaLayer.addTo(map);
+    // const tidalLayer = L.tileLayer(`http://localhost:8080/map_sea/shipxy/terrain/{z}/{x}/{y}.jpg`);
+    // const tidalLayer = L.tileLayer(`http://localhost:8080/TestJava_war_exploded/WebGISHandler?x={x}&y={y}&z={z}`);
+    // tidalLayer.addTo(map);
     console.log(`map`, map);
-    localLayer = myGridLayer
+    // localLayer = myGridLayer
 
-    async function getBlobFromDatabase(z, x, y) {
+    async function getBlobFromDatabase(z: string, x: string, y: string) {
         const SQL = await initSqlJs({
             // Required to load the wasm binary asynchronously. Of course, you can host it wherever you want
             // You can omit locateFile completely when running in node
@@ -153,9 +161,10 @@ async function initMap() {
         const blobData = stmt[0].values[0][0];
         console.log(`blobData`, blobData);
         // Return the blob data as a Promise
-        return new Promise(resolve => {
-            const blob = new Blob([blobData], { type: 'image/jpeg' });
+        return new Promise(resolve => {          
+            const blob = new Blob([(blobData as BlobPart)], { type: 'image/jpeg' });
             const reader = new FileReader();
+
             reader.onload = function () {
                 const result = reader.result;
                 resolve(result);
