@@ -136,19 +136,29 @@ async function initMap() {
     });
     console.log('test');
     console.log('import', import.meta.env.VITE_API_URL);
+    let date_bj = "2023-05-03 00:00:00";
+    let interval_minutes = 60;
     map.on('dblclick', function (e) {
         //获取点击位置的坐标
         var coordinate = [e.latlng.lat, e.latlng.lng];
         //弹框提示点击位置的坐标
         // alert("地图被双击了！点击位置为：" + coordinate);
         //坐标缩小到6位，再将string强转number
-        getLngLatTide(Number(e.latlng.lng.toFixed(4)), Number(e.latlng.lat.toFixed(4)))
+     
+
+        getLngLatTide(Number(e.latlng.lng.toFixed(4)), 
+        Number(e.latlng.lat.toFixed(4)),
+        date_bj,
+        interval_minutes
+        )
     });
 
-    async function getLngLatTide(lng: number, lat: number) {
+    async function getLngLatTide(lng: number, lat: number, date_bj: string, interval_minutes: number) {
         const params: Tide.ReqTideParams = {
             lng: lat,
-            lat: lng
+            lat: lng,
+            dateBJ: date_bj,
+            intervalMinutes: interval_minutes
         };
         console.log('tiderequest', params);
         const { data } = await getLngLatTideApi(params);

@@ -17,7 +17,9 @@ interface TideArrayItem {
 export namespace Tide{
 	export interface ReqTideParams{
 		lng: number;
-		lat: number;	
+		lat: number;
+		dateBJ: string;
+		intervalMinutes: number;	
 	}
 
 	export interface ResTideParams{
