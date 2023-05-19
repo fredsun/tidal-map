@@ -35,6 +35,7 @@
     npm install n-progress //请求时顶部加载进度条
     npm i pinia-plugin-persistedstate//pinia持久化
     npm install echarts    
+    npm install less
 ```
 
 ### 数据读取
