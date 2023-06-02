@@ -1,8 +1,6 @@
 <template>
     <div id='myMap' class="mainMap"></div>
-    <el-form-item label="头像" prop="pass">
-
-    </el-form-item>
+  
 </template>
 <script setup lang="ts">
 import L from 'leaflet';
