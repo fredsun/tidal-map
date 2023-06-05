@@ -2,6 +2,7 @@
     <div :style="drawerContainerStyle" class="drawer-container">
       <div class="drawer">
         <!-- 内容插槽 -->
+
         <slot></slot>
       </div>
       <div  @click="toggleDrawer" class="toggle-button">
@@ -43,23 +44,31 @@
     
   <style scoped>
   .drawer-container {
-    position: fixed;
+    position: absolute;
+    left:0px;
     width: 408px;
     height: 100%;
     z-index: 1201;
     background-color: #881a1a;
+    margin:0;
+    padding:0;
+    display: flex;
   }
   
   .drawer {
-    position: absolute;
+    margin:0;
+    padding:0;
+    position: relative;
     top: 0;
     left: 0;
     width:100%;
     height: 100%;
-    background-color: #f2f2f2;
+    background-color: #fff;
     transition: transform 0.3s ease;
     z-index: 1200;
+    display:flex;
   }
+
   
   .toggle-button {
     position: absolute;
@@ -67,7 +76,7 @@
     left: 100%;
     width: 23px;
     height: 48px;
-    background-color: #f2f2f2;
+    background-color: #fff;
     color: white;
     border: none;
     cursor: pointer;
