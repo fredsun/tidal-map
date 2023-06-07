@@ -15,6 +15,7 @@ import * as TileLnglatTransform from 'tile-lnglat-transform'
 // import exampleImg from '@/assets/3.jpg'
 import { getLngLatTideApi } from "@/api/modules/tide";
 import { Tide } from "@/api/interface"
+import { GlobalStore } from '@/stores';
 
 
 var map: L.Map;
@@ -142,8 +143,8 @@ async function initMap() {
         //弹框提示点击位置的坐标
         // alert("地图被双击了！点击位置为：" + coordinate);
         //坐标缩小到6位，再将string强转number
-     
-
+        const globalStore = GlobalStore();
+        globalStore.addPointLngLat( e.latlng.lng, e.latlng.lat);
         getLngLatTide(Number(e.latlng.lng.toFixed(4)), 
         Number(e.latlng.lat.toFixed(4)),
         date_bj,
@@ -158,6 +159,9 @@ async function initMap() {
             dateBJ: date_bj,
             intervalMinutes: interval_minutes
         };
+        const globalStore = GlobalStore();
+
+        console.log('globalstorePointList', globalStore.pointList);
         console.log('tiderequest', params);
         const { data } = await getLngLatTideApi(params);
         console.log('tideresponseData', data);
@@ -232,6 +236,20 @@ async function initMap() {
         });
     }
 }
+
+const globalStore = GlobalStore();
+console.log("pointList in map", globalStore.pointList);
+watch(() => globalStore.pointList, (newPointList, oldPointList) => {
+  console.log("pointList发生变化", newPointList, oldPointList);
+  for(var point in newPointList){
+    point.id;
+  }
+  points.push({ id: 4, text: newPointList[newPointList.length - 1].lng + "", imageUrl: './src/assets/temp_point.jpg', active: false, clicked: false });
+  console.log("newpoinst", points);
+},
+  { deep: true });
+
+
 
 </script>
 <style>

@@ -1,17 +1,19 @@
 <template>
   <drawer>
     <div class="drawer-route">
-      <ul class="drawer-ul">
-        <li v-for="item in items" :key="item.id">
-          <!-- <button> -->
-          <div class="drawer-li">
-            <img :src="item.imageUrl" class="drawer-img" />
-            <span>{{ item.text }}</span>
-          </div>
+      <div>
+        <ul class="drawer-ul">
+          <li v-for="item in items" :key="item.id">
+            <!-- <button> -->
+            <div class="drawer-li">
+              <img :src="item.imageUrl" class="drawer-img" />
+              <span>{{ item.text }}</span>
+            </div>
 
-          <!-- </button> -->
-        </li>
-      </ul>
+            <!-- </button> -->
+          </li>
+        </ul>
+      </div>
       <div class="drawer-divider" />
       <ul class="point-ul">
         <li v-for="point in points" :key="point.id">
@@ -35,11 +37,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch } from 'vue'
 import Map from "@/layouts/components/Map/index.vue";
 // import Map from "../Map/index.vue";
 // import exampleImg from '@/assets/3.jpg'
 import drawer from "@/layouts/components/drawer/index.vue";
+import { GlobalStore } from '@/stores';
 const isShowDrawer = false;
 function handleClose() {
   console.log("handleclose");
@@ -59,10 +62,21 @@ interface Point {
 }
 
 const points = reactive<Point[]>([
-  { id: 1, text: 'point1', imageUrl: './src/assets/temp_point.jpg', active: false, clicked: false },
-  { id: 2, text: 'point2', imageUrl: './src/assets/temp_point.jpg', active: false, clicked: false },
-  { id: 3, text: 'point3', imageUrl: './src/assets/temp_point.jpg', active: false, clicked: false },
+
 ])
+
+
+//数据反推 point item 增加
+const globalStore = GlobalStore();
+console.log("pointList in map", globalStore.pointList);
+watch(() => globalStore.pointList, (newPointList, oldPointList) => {
+  console.log("pointList发生变化", newPointList, oldPointList);
+  points.push({ id: 4, text: newPointList[newPointList.length - 1].lng + "", imageUrl: './src/assets/temp_point.jpg', active: false, clicked: false });
+  console.log("newpoinst", points);
+},
+  { deep: true });
+
+
 
 function handlePointEnter(point: Point) {
   point.active = true;
@@ -84,6 +98,9 @@ function handlePointClick(point: Point) {
     }
   }
   point.clicked = true;
+
+  const globalStore = GlobalStore();
+  console.log("pointList in map", globalStore.pointList);
 }
 
 
@@ -106,6 +123,10 @@ reader.onerror = (event) => {
 .drawer-ul,
 .point-ul {
   margin: 0;
+  overflow-x:hidden;
+  overflow-y:auto;
+  scrollbar-width:none;
+  
 }
 
 .drawer-route {
@@ -171,7 +192,7 @@ li {
 
 .point-img-bg {
   position: relative;
-  display:flex;
+  display: flex;
   flex-direction: column;
   width: 32px;
   height: 32px;
@@ -179,7 +200,7 @@ li {
 }
 
 .point-img-border {
-  position:absolute;
+  position: absolute;
   height: 32px;
   width: 32px;
   border-radius: 8px;
@@ -202,4 +223,5 @@ li {
 .point-text {
   width: 72px;
   height: 24px;
-}</style>
+}
+</style>

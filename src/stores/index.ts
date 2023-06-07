@@ -1,8 +1,9 @@
 import { defineStore, createPinia } from "pinia";
-import { GlobalState, ThemeConfigProps, AssemblySizeType } from "./interface";
+import { GlobalState, ThemeConfigProps, AssemblySizeType, Point } from "./interface";
 import { DEFAULT_PRIMARY } from "@/config/config";
 import piniaPersistConfig from "@/config/piniaPersist";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
+import { point } from "leaflet";
 
 // defineStore 调用后返回一个函数，调用该函数获得 Store 实体
 export const GlobalStore = defineStore({
@@ -44,7 +45,8 @@ export const GlobalStore = defineStore({
 			tabsIcon: true,
 			// 页脚
 			footer: true
-		}
+		},
+		pointList:[],
 	}),
 	getters: {},
 	actions: {
@@ -67,6 +69,24 @@ export const GlobalStore = defineStore({
 		// setThemeConfig
 		setThemeConfig(themeConfig: ThemeConfigProps) {
 			this.themeConfig = themeConfig;
+		},
+		addPoint(point : Point){
+			this.pointList.push(point);
+		},
+		addPointLngLat(lng: number, lat: number){
+			const point:Point ={
+				id: this.pointList.length,
+				text: "string",
+				imageUrl: "string",
+				active: false,
+				clicked: false,
+				lng: lng,
+				lat: lat,
+			};
+			this.pointList.push(point);
+		},
+		clearPoints(){
+			this.pointList=[];
 		}
 	},
 	persist: piniaPersistConfig("GlobalState")

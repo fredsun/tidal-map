@@ -8,6 +8,7 @@ export interface GlobalState {
     assemblySize: AssemblySizeType;
     language: string;
     themeConfig: ThemeConfigProps;
+    pointList: Point[];
 }
 
 /* themeConfigProp */
@@ -56,4 +57,14 @@ export interface AuthState {
 /* keepAliveState */
 export interface keepAliveState {
     keepAliveName: string[];
+}
+
+export interface Point{
+    id: number;
+    text: string;
+    imageUrl: string;
+    active: boolean;
+    clicked: boolean;
+    lng:number;
+    lat:number;
 }
