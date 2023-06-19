@@ -73,7 +73,9 @@ export const GlobalStore = defineStore({
 
 		addPointLngLat(lng: number, lat: number) {
 			const point: Point = {
-				id: this.pointList.length,
+				id: this.pointList.length+"",
+				drawerId: "drawer"+this.pointList.length,
+				mapId: "map"+this.pointList.length,
 				text: "string",
 				imageUrl: "string",
 				active: false,
@@ -90,7 +92,9 @@ export const GlobalStore = defineStore({
 
 		addPointLngLatData(lng: number, lat: number, timesStampData:string[], tidesData:number[]) {
 			const point: Point = {
-				id: this.pointList.length,
+				id: "point"+this.pointList.length,
+				drawerId: "drawer"+this.pointList.length,
+				mapId: "map"+this.pointList.length,
 				text: this.pointList.length+"",
 				imageUrl: "string",
 				active: false,
@@ -103,6 +107,7 @@ export const GlobalStore = defineStore({
 				},
 			};
 			this.pointList.push(point);
+			return point.mapId;
 		},
 
 		clearPoints() {

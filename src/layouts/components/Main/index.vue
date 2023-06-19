@@ -38,7 +38,7 @@
                 <img class="index-point-img" :src="point.imageUrl" />
               </div>
 
-              <EchartItem class="index-point-echart" :chartData="point" :id="point.id" />
+              <EchartItem class="index-point-echart" :chartData="point" :id="point.drawerId" />
 
             </div>
           </div>
@@ -85,6 +85,7 @@ const globalStore = GlobalStore();
 console.log("pointList in map", globalStore.pointList);
 
 
+//vue3的数组监听地址相同无法判别oldnew,序列化转字符串观察
 const computedPoint = computed(() => JSON.parse(JSON.stringify(globalStore.pointList)));
 watch(computedPoint, (newVal, oldVal) => {
   console.log("newComputedPoint", newVal);

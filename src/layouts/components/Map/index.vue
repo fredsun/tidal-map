@@ -15,6 +15,7 @@ import * as TileLnglatTransform from 'tile-lnglat-transform'
 import { getLngLatTideApi } from "@/api/modules/tide";
 import { Tide } from "@/api/interface"
 import { GlobalStore } from '@/stores';
+import { ElMessage } from 'element-plus';
 
 
 var map: L.Map;
@@ -163,41 +164,81 @@ async function initMap() {
         const { data } = await getLngLatTideApi(params);
         createMarker(lng, lat, data);
     }
+
     function createMarker(lng: number, lat: number, data: Tide.ResTideParams) {
-        console.log("data",data);
-        L.marker([lat, lng]).addTo(map)
-            .bindPopup(popupContent)
-            .on('popupopen', function (e) {
+        console.log("data", data);
+        //根据接口返回值判断marker图标
+        if (typeof data !== 'undefined') {
+         
+            const globalStore = GlobalStore();
 
-                // 补充非空断言 '!'
-                var myChart = echarts.init(document.getElementById(idStr)!);
-                // 指定图表的配置项和数据
-                var option = {
-                    title: {
-                        text: '潮汐'
-                    },
-                    tooltip: {},
-                    legend: {
-                        data: ['高度/米']
-                    },
-                    xAxis: {
-                        data: data.timesStamp
-                    },
-                    yAxis: {},
-                    series: [
-                        {
-                            name: '高度/米',
-                            type: 'bar',
-                            data: data.tides
-                        }
-                    ]
-                };
+            const mapId = globalStore.addPointLngLatData(lng, lat, data.timesStamp, data.tides);
+            var popupContent = '<div style="width:350px;height:300px" id="' + mapId + '"></div>';
+ 
+            // const echartStatis = echarts.getInstanceByDom(document.getElementById(id + "")!);
+            // if(echartStatis == null){
+            //     console.log("id已经被使用");
+            // }else{
+            //     console.log("id未使用");
+            // }
+            L.marker([lat, lng]).addTo(map)
+                .bindPopup(popupContent)
+                .on('popupopen', function (e) {
 
-                // 使用刚指定的配置项和数据显示图表。
-                myChart.setOption(option);
-            });
-        const globalStore = GlobalStore();
-        globalStore.addPointLngLatData(lng, lat, data.timesStamp, data.tides);
+                    // 补充非空断言 '!'
+                    console.log("mapchartID", mapId);
+                    var myChart = echarts.init(document.getElementById(mapId + "")!);
+                    // 指定图表的配置项和数据
+                    var option = {
+                        title: {
+                            text: '潮汐'
+                        },
+                        tooltip: {},
+                        legend: {
+                            data: ['高度/米']
+                        },
+                        xAxis: {
+                            data: data.timesStamp
+                        },
+                        yAxis: {},
+                        series: [
+                            {
+                                name: '高度/米',
+                                type: 'bar',
+                                data: data.tides
+                            }
+                        ]
+                    };
+
+                    // 使用刚指定的配置项和数据显示图表。
+                    myChart.setOption(option);
+                });
+
+        } else {
+            ElMessage({
+                showClose: true,
+                message: '该点无法观测潮汐',
+                type: 'error',
+            })
+            // var icon = L.icon({
+            //     //图标地址
+            //     iconUrl: "@/assets/arrow_left_2x.png",
+            //     //图标大小
+            //     iconSize: [38, 95]
+            // })
+            // var popupContent = '<div style="width:50px; height:50px" id="' + idStr + '"></div>';
+            // L.marker([lat, lng]).addTo(map)
+            //     .bindPopup(popupContent)
+            //     .setIcon(icon)
+            //     .on('popupopen', function (e) {
+            //         console.log("该pop无数据");
+            //         const element = document.getElementById(idStr);
+            //         if (element) {
+            //             element.textContent = '该pop无数据';
+            //         }
+            //     });
+        }
+
     }
     console.log(`map`, map);
     async function getBlobFromDatabase(z: string, x: string, y: string) {

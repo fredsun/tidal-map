@@ -62,7 +62,9 @@ export interface keepAliveState {
 }
 
 export interface Point{
-    id: number;
+    id: string;
+    drawerId: string;
+    mapId: string;
     text: string;
     imageUrl: string;
     active: boolean;

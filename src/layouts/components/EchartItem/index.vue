@@ -51,7 +51,7 @@ const option = {
 function initChart() {
     // setTimeout(() => {
         console.log("echartid" + props.chartData?.id);
-        chartInstance = echarts.init(document.getElementById(props.chartData?.id + "")!);
+        chartInstance = echarts.init(document.getElementById(props.chartData?.drawerId + "")!);
         chartInstance.setOption(option);
         console.log("props", props.chartData?.data);
     // }, 800);
