@@ -46,7 +46,7 @@ export const GlobalStore = defineStore({
 			// 页脚
 			footer: true
 		},
-		pointList:[],
+		pointList: [],
 	}),
 	getters: {},
 	actions: {
@@ -70,11 +70,9 @@ export const GlobalStore = defineStore({
 		setThemeConfig(themeConfig: ThemeConfigProps) {
 			this.themeConfig = themeConfig;
 		},
-		addPoint(point : Point){
-			this.pointList.push(point);
-		},
-		addPointLngLat(lng: number, lat: number){
-			const point:Point ={
+
+		addPointLngLat(lng: number, lat: number) {
+			const point: Point = {
 				id: this.pointList.length,
 				text: "string",
 				imageUrl: "string",
@@ -82,11 +80,33 @@ export const GlobalStore = defineStore({
 				clicked: false,
 				lng: lng,
 				lat: lat,
+				data: {
+					timesStamp: [],
+					tides: []
+				},
 			};
 			this.pointList.push(point);
 		},
-		clearPoints(){
-			this.pointList=[];
+
+		addPointLngLatData(lng: number, lat: number, timesStampData:string[], tidesData:number[]) {
+			const point: Point = {
+				id: this.pointList.length,
+				text: this.pointList.length+"",
+				imageUrl: "string",
+				active: false,
+				clicked: false,
+				lng: lng,
+				lat: lat,
+				data: {
+					timesStamp: timesStampData,
+					tides: tidesData
+				},
+			};
+			this.pointList.push(point);
+		},
+
+		clearPoints() {
+			this.pointList = [];
 		}
 	},
 	persist: piniaPersistConfig("GlobalState")

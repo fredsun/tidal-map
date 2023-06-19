@@ -12,7 +12,7 @@ export interface ResultData<T = any> extends Result {
 interface TideArrayItem {
 	dateStr: string; // 日期字符串
 	paramNum: number; // 数值
-  }
+}
 
 export namespace Tide{
 	export interface ReqTideParams{

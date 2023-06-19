@@ -29,7 +29,21 @@
       </ul>
     </div>
     <div class="drawer-index">
+      <ul class="index-point-detail-ul">
+        <li v-for="point in points" :key="point.id">
+          <div class="index-point-detail-li">
+            <div class="index-point-bg">
+              <div class="index-point-title-bg">
+                <span>{{ point.text }}</span>
+                <img class="index-point-img" :src="point.imageUrl" />
+              </div>
 
+              <EchartItem class="index-point-echart" :chartData="point" :id="point.id" />
+
+            </div>
+          </div>
+        </li>
+      </ul>
     </div>
 
   </drawer>
@@ -37,12 +51,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, computed } from 'vue'
 import Map from "@/layouts/components/Map/index.vue";
+import EchartItem from "@/layouts/components/EchartItem/index.vue";
 // import Map from "../Map/index.vue";
 // import exampleImg from '@/assets/3.jpg'
 import drawer from "@/layouts/components/drawer/index.vue";
 import { GlobalStore } from '@/stores';
+import { onMounted } from 'vue';
+import * as echarts from 'echarts';
+import { Point } from "@/stores/interface";
+import { Tide } from '@/api/interface'
+
 const isShowDrawer = false;
 function handleClose() {
   console.log("handleclose");
@@ -53,13 +73,7 @@ const items = reactive([
   { id: 3, text: '最近', imageUrl: './src/assets/gm_history_grey600_24dp.png' },
 ])
 
-interface Point {
-  id: number;
-  text: string;
-  imageUrl: string;
-  active: boolean;
-  clicked: boolean;
-}
+
 
 const points = reactive<Point[]>([
 
@@ -69,17 +83,22 @@ const points = reactive<Point[]>([
 //数据反推 point item 增加
 const globalStore = GlobalStore();
 console.log("pointList in map", globalStore.pointList);
-watch(() => globalStore.pointList, (newPointList, oldPointList) => {
-  console.log("pointList发生变化", newPointList, oldPointList);
-  points.push({ id: 4, text: newPointList[newPointList.length - 1].lng + "", imageUrl: './src/assets/temp_point.jpg', active: false, clicked: false });
-  console.log("newpoinst", points);
-},
-  { deep: true });
 
+
+const computedPoint = computed(() => JSON.parse(JSON.stringify(globalStore.pointList)));
+watch(computedPoint, (newVal, oldVal) => {
+  console.log("newComputedPoint", newVal);
+  console.log("oldComputedPoint", oldVal);
+  if (oldVal.length < newVal.length) {
+    console.log("pointList产生push");
+    points.push(newVal[newVal.length - 1]);
+  }
+})
 
 
 function handlePointEnter(point: Point) {
-  point.active = true;
+  //todo
+  point.active = false;
 }
 
 
@@ -93,14 +112,16 @@ function handlePointClick(point: Point) {
   //点击一个point，还原其他point样式
   for (const p of points) {
     if (p !== point) {
+      console.log("进了for");
       p.active = false;
       p.clicked = false;
     }
   }
+  console.log("没进for");
   point.clicked = true;
-
-  const globalStore = GlobalStore();
-  console.log("pointList in map", globalStore.pointList);
+  console.log("click后points", points);
+  // const globalStore = GlobalStore();
+  // console.log("pointList in map", globalStore.pointList);
 }
 
 
@@ -118,15 +139,16 @@ reader.onerror = (event) => {
 };
 
 
+
 </script>
 <style>
 .drawer-ul,
-.point-ul {
+.point-ul,
+.index-point-detail-ul {
   margin: 0;
-  overflow-x:hidden;
-  overflow-y:auto;
-  scrollbar-width:none;
-  
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
 }
 
 .drawer-route {
@@ -176,6 +198,8 @@ li {
 .drawer-index {
   background-color: #1a884a;
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .point-li span {
@@ -223,5 +247,17 @@ li {
 .point-text {
   width: 72px;
   height: 24px;
+}
+
+
+.index-point-detail-li {
+  width: 100%;
+  height: 400px;
+
+}
+
+.index-point-echart {
+  width: 300px;
+  height: 200px;
 }
 </style>

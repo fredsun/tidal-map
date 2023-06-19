@@ -1,6 +1,5 @@
 <template>
     <div id='myMap' class="mainMap"></div>
-  
 </template>
 <script setup lang="ts">
 import L from 'leaflet';
@@ -138,17 +137,18 @@ async function initMap() {
     let date_bj = "2023-05-03 00:00:00";
     let interval_minutes = 60;
     map.on('dblclick', function (e) {
+        console.log("dbclick");
         //获取点击位置的坐标
         var coordinate = [e.latlng.lat, e.latlng.lng];
         //弹框提示点击位置的坐标
         // alert("地图被双击了！点击位置为：" + coordinate);
         //坐标缩小到6位，再将string强转number
-        const globalStore = GlobalStore();
-        globalStore.addPointLngLat( e.latlng.lng, e.latlng.lat);
-        getLngLatTide(Number(e.latlng.lng.toFixed(4)), 
-        Number(e.latlng.lat.toFixed(4)),
-        date_bj,
-        interval_minutes
+        // const globalStore = GlobalStore();
+        // globalStore.addPointLngLat( e.latlng.lng, e.latlng.lat);
+        getLngLatTide(Number(e.latlng.lng.toFixed(4)),
+            Number(e.latlng.lat.toFixed(4)),
+            date_bj,
+            interval_minutes
         )
     });
 
@@ -160,17 +160,11 @@ async function initMap() {
             intervalMinutes: interval_minutes
         };
         const globalStore = GlobalStore();
-
-        console.log('globalstorePointList', globalStore.pointList);
-        console.log('tiderequest', params);
         const { data } = await getLngLatTideApi(params);
-        console.log('tideresponseData', data);
         createMarker(lng, lat, data);
     }
     function createMarker(lng: number, lat: number, data: Tide.ResTideParams) {
-        console.log('tideresponseData2', data);
-        console.log("data.timeArray", data.timesStamp);
-        console.log("data.tideArray", data.tides);
+        console.log("data",data);
         L.marker([lat, lng]).addTo(map)
             .bindPopup(popupContent)
             .on('popupopen', function (e) {
@@ -201,8 +195,9 @@ async function initMap() {
 
                 // 使用刚指定的配置项和数据显示图表。
                 myChart.setOption(option);
-            })
-            ;
+            });
+        const globalStore = GlobalStore();
+        globalStore.addPointLngLatData(lng, lat, data.timesStamp, data.tides);
     }
     console.log(`map`, map);
     async function getBlobFromDatabase(z: string, x: string, y: string) {
@@ -236,19 +231,6 @@ async function initMap() {
         });
     }
 }
-
-const globalStore = GlobalStore();
-console.log("pointList in map", globalStore.pointList);
-watch(() => globalStore.pointList, (newPointList, oldPointList) => {
-  console.log("pointList发生变化", newPointList, oldPointList);
-  for(var point in newPointList){
-    point.id;
-  }
-  points.push({ id: 4, text: newPointList[newPointList.length - 1].lng + "", imageUrl: './src/assets/temp_point.jpg', active: false, clicked: false });
-  console.log("newpoinst", points);
-},
-  { deep: true });
-
 
 
 </script>

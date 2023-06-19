@@ -2,6 +2,8 @@
  * 存放在 Pinia 里的 Key【类似 Android: Sharedpreference缓存】
  */
 /* GlobalState */
+import { Tide } from "@/api/interface"
+
 export interface GlobalState {
     token: string;
     userInfo: any;
@@ -67,4 +69,5 @@ export interface Point{
     clicked: boolean;
     lng:number;
     lat:number;
+    data:Tide.ResTideParams;
 }
