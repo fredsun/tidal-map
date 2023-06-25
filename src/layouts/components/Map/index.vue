@@ -4,7 +4,7 @@
 <script setup lang="ts">
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css'
-import { onMounted, defineProps, watch, inject, ref } from 'vue'
+import { onMounted, defineProps, watch, inject, ref, computed } from 'vue'
 import { getMapKeystore } from '@/stores/keystore'
 import * as echarts from 'echarts';
 import '@/assets/data.ts'
@@ -16,13 +16,16 @@ import { getLngLatTideApi } from "@/api/modules/tide";
 import { Tide } from "@/api/interface"
 import { GlobalStore } from '@/stores';
 import { ElMessage } from 'element-plus';
+import { Point } from '@/stores/interface';
 
 
 var map: L.Map;
+var markerMap: Map<String, L.Marker> = new Map();;
 var blobImg;
 onMounted(() => {
     initMap();
 })
+
 
 async function initMap() {
     const vecLayer = L.tileLayer(`https://t0.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=${getMapKeystore()}`);
@@ -71,36 +74,36 @@ async function initMap() {
     console.log(`tileLnglatGoogle`, tileTileGoogle);
     var idStr = "aaa";
     var popupContent = '<div style="width:350px;height:300px" id="' + idStr + '"></div>';
-    L.marker([33.837605, 121.490808]).addTo(map)
-        .bindPopup(popupContent)
-        .on('popupopen', function (e) {
+    // L.marker([33.837605, 121.490808]).addTo(map)
+    //     .bindPopup(popupContent)
+    //     .on('popupopen', function (e) {
 
-            // 补充非空断言 '!'
-            var myChart = echarts.init(document.getElementById(idStr)!);
-            // 指定图表的配置项和数据
-            var option = {
-                title: {
-                    text: '测试'
-                },
-                tooltip: {},
-                legend: {
-                    data: ['销量']
-                },
-                xAxis: {
-                    data: ["衬衫", "羊毛衫", "雪纺衫", "裤子"]
-                },
-                yAxis: {},
-                series: [{
-                    name: '销量',
-                    type: 'bar',
-                    data: [5, 20, 36, 10]
-                }]
-            };
+    //         // 补充非空断言 '!'
+    //         var myChart = echarts.init(document.getElementById(idStr)!);
+    //         // 指定图表的配置项和数据
+    //         var option = {
+    //             title: {
+    //                 text: '测试'
+    //             },
+    //             tooltip: {},
+    //             legend: {
+    //                 data: ['销量']
+    //             },
+    //             xAxis: {
+    //                 data: ["衬衫", "羊毛衫", "雪纺衫", "裤子"]
+    //             },
+    //             yAxis: {},
+    //             series: [{
+    //                 name: '销量',
+    //                 type: 'bar',
+    //                 data: [5, 20, 36, 10]
+    //             }]
+    //         };
 
-            // 使用刚指定的配置项和数据显示图表。
-            myChart.setOption(option);
-        })
-        ;
+    //         // 使用刚指定的配置项和数据显示图表。
+    //         myChart.setOption(option);
+    //     })
+    //     ;
 
 
     var MyGridLayer = L.GridLayer.extend({
@@ -169,19 +172,20 @@ async function initMap() {
         console.log("data", data);
         //根据接口返回值判断marker图标
         if (typeof data !== 'undefined') {
-         
-            const globalStore = GlobalStore();
 
+            const globalStore = GlobalStore();
+          
             const mapId = globalStore.addPointLngLatData(lng, lat, data.timesStamp, data.tides);
+            //地图基于id产生popupwindow
             var popupContent = '<div style="width:350px;height:300px" id="' + mapId + '"></div>';
- 
+
             // const echartStatis = echarts.getInstanceByDom(document.getElementById(id + "")!);
             // if(echartStatis == null){
             //     console.log("id已经被使用");
             // }else{
             //     console.log("id未使用");
             // }
-            L.marker([lat, lng]).addTo(map)
+            const marker = L.marker([lat, lng]).addTo(map)
                 .bindPopup(popupContent)
                 .on('popupopen', function (e) {
 
@@ -213,7 +217,8 @@ async function initMap() {
                     // 使用刚指定的配置项和数据显示图表。
                     myChart.setOption(option);
                 });
-
+                const latlng = L.latLng(lat, lng);
+                markerMap.set(JSON.stringify(latlng), marker);
         } else {
             ElMessage({
                 showClose: true,
@@ -272,6 +277,39 @@ async function initMap() {
         });
     }
 }
+
+function moveToFocusPoint(point: Point) {
+
+    let latlng = L.latLng(point.lat, point.lng);
+
+    map.setView(latlng, 8);
+    console.log("markermap", markerMap);
+    console.log("latlng", latlng);
+    console.log("point", point.lat, point.lng);
+    console.log("markermap", markerMap.get(JSON.stringify(latlng)));
+    markerMap.get(JSON.stringify(latlng))?.openPopup();
+}
+
+defineExpose({
+    moveToFocusPoint
+})
+
+
+// //数据反推 point item 增加
+// const globalStore = GlobalStore();
+// console.log("pointList in map", globalStore.pointList);
+
+
+// //vue3的数组监听地址相同无法判别oldnew,序列化转字符串观察
+// const computedPoint = computed(() => JSON.parse(JSON.stringify(globalStore.pointList)));
+// watch(computedPoint, (newVal, oldVal) => {
+//   console.log("newComputedPoint", newVal);
+//   console.log("oldComputedPoint", oldVal);
+
+//   if (oldVal.length < newVal.length) {
+//     console.log("pointList产生push");
+//   }
+// })
 
 
 </script>

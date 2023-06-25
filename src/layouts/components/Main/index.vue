@@ -47,7 +47,7 @@
     </div>
 
   </drawer>
-  <Map></Map>
+  <Map ref="mapRef"></Map>
 </template>
 
 <script setup lang="ts">
@@ -72,6 +72,8 @@ const items = reactive([
   { id: 2, text: '已储存', imageUrl: './src/assets/saved_filled_24px_grey_650.png' },
   { id: 3, text: '最近', imageUrl: './src/assets/gm_history_grey600_24dp.png' },
 ])
+
+const mapRef = ref();
 
 
 
@@ -99,6 +101,7 @@ watch(computedPoint, (newVal, oldVal) => {
 
 function handlePointEnter(point: Point) {
   //todo
+  
   point.active = false;
 }
 
@@ -121,12 +124,14 @@ function handlePointClick(point: Point) {
   console.log("没进for");
   point.clicked = true;
   console.log("click后points", points);
-  // const globalStore = GlobalStore();
-  // console.log("pointList in map", globalStore.pointList);
+  //触发地图移动
+  console.log("mapref", mapRef);
+  console.log("mapRef.value", mapRef.value);
+  mapRef.value.moveToFocusPoint(point);
 }
 
 
-// var imgSrc = exampleImg;
+
 let imageData: any = null;
 
 const reader = new FileReader();
@@ -148,7 +153,7 @@ reader.onerror = (event) => {
 .index-point-detail-ul {
   margin: 0;
   overflow-x: hidden;
-  overflow-y: auto;
+  verflow-y: auto;
   scrollbar-width: none;
 }
 
@@ -197,7 +202,7 @@ li {
 }
 
 .drawer-index {
-  background-color: #1a884a;
+  background-color: #fff;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -253,7 +258,7 @@ li {
 
 .index-point-detail-li {
   width: 100%;
-  height: 400px;
+  height: 300px;
 
 }
 
