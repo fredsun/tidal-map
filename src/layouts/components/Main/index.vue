@@ -74,9 +74,9 @@ import { GlobalStore } from '@/stores';
 import { onMounted } from 'vue';
 import * as echarts from 'echarts';
 import { Point, StorageKind } from "@/stores/interface";
-import { Tide } from '@/api/interface'
+import { Tide, MultiTide } from '@/api/interface'
 
-import { getLngLatTideApi } from "@/api/modules/tide";
+import { getLngLatTideApi,getMultiTideApi } from "@/api/modules/tide";
 import { ElMessage } from 'element-plus'
 const isShowDrawer = false;
 function handleClose() {
@@ -208,19 +208,19 @@ function handleHeaderClick() {
     console.log("queryDateValue 的值", queryDateValue.value);
     console.log("input 的值", input.value);
     const point = points[points.length - 1];
-    points.forEach(function (element) {
-      console.log("element", element);
-      getLngLatTide(point.lng, point.lat, queryDateValue.value, parseInt(input.value))
-    })
-
+    // points.forEach(function (element) {
+    //   console.log("element", element);
+    //   getLngLatTide(point.lng, point.lat, queryDateValue.value, parseInt(input.value))
+    // })
+    getMultiTide(points, queryDateValue.value, parseInt(input.value));
   }
 }
 
 
 async function getLngLatTide(lng: number, lat: number, date_bj: string, interval_minutes: number) {
   const params: Tide.ReqTideParams = {
-    lng: lat,
-    lat: lng,
+    lng: lng,
+    lat: lat,
     dateBJ: date_bj,
     intervalMinutes: interval_minutes
   };
@@ -228,6 +228,21 @@ async function getLngLatTide(lng: number, lat: number, date_bj: string, interval
   const { data } = await getLngLatTideApi(params);
   console.log("responseData", data);
 }
+
+async function getMultiTide(_points: Point[], _date_bj: string, _interval_minutes: number) {
+  const latlngList = _points.map(point => ({ lat: point.lat, lng: point.lng }));
+  const latlngListJSON = JSON.stringify(latlngList);
+  console.log("latlngList", latlngList);
+  const params: MultiTide.ReqMultiTideParams = {
+    pointLatlngListJSON: latlngListJSON,
+    dateBJ: _date_bj,
+    intervalMinutes: _interval_minutes
+  };
+  const globalStore = GlobalStore();
+  const { data } = await getMultiTideApi(params);
+  console.log("responseData", data);
+}
+
 
 
 

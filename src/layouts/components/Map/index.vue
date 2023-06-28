@@ -158,8 +158,8 @@ async function initMap() {
 
     async function getLngLatTide(lng: number, lat: number, date_bj: string, interval_minutes: number) {
         const params: Tide.ReqTideParams = {
-            lng: lat,
-            lat: lng,
+            lng: lng,
+            lat: lat,
             dateBJ: date_bj,
             intervalMinutes: interval_minutes
         };

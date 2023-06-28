@@ -14,6 +14,18 @@ interface TideArrayItem {
 	paramNum: number; // 数值
 }
 
+export interface ReqPointLatlng{
+	lng:number;
+	lat:number;
+}
+
+export interface ResPoint{
+	lat:number;
+	lng:number;
+	timesStamp: string[];
+	tides: number[];
+}
+
 export namespace Tide{
 	export interface ReqTideParams{
 		lng: number;
@@ -29,5 +41,17 @@ export namespace Tide{
 	
 }
 
+export namespace MultiTide{
+	export interface ReqMultiTideParams{
+		pointLatlngListJSON: string;
+		dateBJ: string;
+		intervalMinutes: number;	
+	}
+
+	export interface ResMultiTideParams{
+		ResPoints: ResPoint[];
+	}
+	
+}
 
 
