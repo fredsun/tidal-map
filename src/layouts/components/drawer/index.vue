@@ -57,7 +57,7 @@ const toggleDrawer = () => {
 .drawer-container {
   position: absolute;
   left: 0px;
-  width: 408px;
+  width: 600px;
   height: 100%;
   z-index: 1201;
   background-color: #881a1a;

@@ -69,7 +69,13 @@ export interface Point{
     imageUrl: string;
     active: boolean;
     clicked: boolean;
+    storage:StorageKind;
     lng:number;
     lat:number;
     data:Tide.ResTideParams;
+}
+
+export enum StorageKind{
+    Empty ,
+    Stored
 }

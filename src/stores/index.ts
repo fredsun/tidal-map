@@ -1,9 +1,9 @@
 import { defineStore, createPinia } from "pinia";
-import { GlobalState, ThemeConfigProps, AssemblySizeType, Point } from "./interface";
+import { GlobalState, ThemeConfigProps, AssemblySizeType, Point, StorageKind } from "./interface";
 import { DEFAULT_PRIMARY } from "@/config/config";
 import piniaPersistConfig from "@/config/piniaPersist";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
-import { point } from "leaflet";
+
 
 // defineStore 调用后返回一个函数，调用该函数获得 Store 实体
 export const GlobalStore = defineStore({
@@ -76,10 +76,11 @@ export const GlobalStore = defineStore({
 				id: this.pointList.length+"",
 				drawerId: "drawer"+this.pointList.length,
 				mapId: "map"+this.pointList.length,
-				text: "string",
+				text: "点位"+this.pointList.length+"",
 				imageUrl: "src/assets/temp_point.jpg",
 				active: false,
 				clicked: false,
+				storage: StorageKind.Empty,
 				lng: lng,
 				lat: lat,
 				data: {
@@ -95,10 +96,11 @@ export const GlobalStore = defineStore({
 				id: "point"+this.pointList.length,
 				drawerId: "drawer"+this.pointList.length,
 				mapId: "map"+this.pointList.length,
-				text: this.pointList.length+"",
+				text: "点位"+this.pointList.length+"",
 				imageUrl: "src/assets/temp_point.jpg",
 				active: false,
 				clicked: false,
+				storage: StorageKind.Empty,
 				lng: lng,
 				lat: lat,
 				data: {
