@@ -114,7 +114,8 @@ export const GlobalStore = defineStore({
 
 		clearPoints() {
 			this.pointList = [];
-		}
+		},
+		
 	},
 	persist: piniaPersistConfig("GlobalState")
 });

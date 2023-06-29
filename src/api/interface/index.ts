@@ -49,7 +49,7 @@ export namespace MultiTide{
 	}
 
 	export interface ResMultiTideParams{
-		ResPoints: ResPoint[];
+		point_tide_list: ResPoint[];
 	}
 	
 }

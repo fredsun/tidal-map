@@ -76,7 +76,7 @@ import * as echarts from 'echarts';
 import { Point, StorageKind } from "@/stores/interface";
 import { Tide, MultiTide } from '@/api/interface'
 
-import { getLngLatTideApi,getMultiTideApi } from "@/api/modules/tide";
+import { getLngLatTideApi, getMultiTideApi } from "@/api/modules/tide";
 import { ElMessage } from 'element-plus'
 const isShowDrawer = false;
 function handleClose() {
@@ -84,7 +84,7 @@ function handleClose() {
 }
 const items = reactive([
   { id: 1, text: '', imageUrl: './src/assets/gm_menu_gm_grey600_24dp.png' },
-  { id: 2, text: '已储存', imageUrl: './src/assets/saved_filled_24px_grey_650.png' },
+  { id: 2, text: '已关注', imageUrl: './src/assets/saved_filled_24px_grey_650.png' },
   { id: 3, text: '最近', imageUrl: './src/assets/gm_history_grey600_24dp.png' },
 ])
 
@@ -160,11 +160,11 @@ function getStorageText(point: Point) {
 
   switch (point.storage) {
     case StorageKind.Empty:
-      console.log("switch储存");
-      return "储存"
+      console.log("switch关注");
+      return "关注"
     case StorageKind.Stored:
-      console.log("switch已储存");
-      return "已储存"
+      console.log("switch已关注");
+      return "已关注"
 
     default:
       console.log("switchdefault");
@@ -229,6 +229,7 @@ async function getLngLatTide(lng: number, lat: number, date_bj: string, interval
   console.log("responseData", data);
 }
 
+//批量查询点位潮高
 async function getMultiTide(_points: Point[], _date_bj: string, _interval_minutes: number) {
   const latlngList = _points.map(point => ({ lat: point.lat, lng: point.lng }));
   const latlngListJSON = JSON.stringify(latlngList);
@@ -240,7 +241,33 @@ async function getMultiTide(_points: Point[], _date_bj: string, _interval_minute
   };
   const globalStore = GlobalStore();
   const { data } = await getMultiTideApi(params);
-  console.log("responseData", data);
+  console.log("points.length", points.length);
+  console.log("data.point_tide_list", data.point_tide_list.length);
+
+  for (let index = 0; index < points.length; index++) {
+    const oldPoint = points[index];
+    console.log("element", oldPoint.lat);
+
+    data.point_tide_list.forEach(function (resPoint) {
+      console.log("resPoint", resPoint.lat);
+      if (oldPoint.lat == resPoint.lat && oldPoint.lng == resPoint.lng) {
+        console.log("数据变了", oldPoint.lat);
+        oldPoint.data.tides = resPoint.tides;
+        oldPoint.data.timesStamp = resPoint.timesStamp;
+        // oldPoint.data.tides = [];
+        // oldPoint.data.timesStamp = [];
+        points.splice(index, 1, oldPoint);
+      } else {
+        console.log("数据没变", oldPoint.lat);
+      }
+    })
+  }
+
+  //  points.pop();
+  console.log("points.length", points.length);
+
+
+
 }
 
 
