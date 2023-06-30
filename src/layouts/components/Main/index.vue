@@ -286,6 +286,8 @@ async function getMultiTide(_points: Point[], _date_bj: string, _interval_minute
 .drawer-route {
   display: flex;
   flex-direction: column;
+  box-shadow:0 1px 2px rgba(60,64,67,0.3), 0 2px 6px 2px rgba(60,64,67,0.15);
+  z-index: 4;
 }
 
 .drawer-li,
@@ -332,6 +334,7 @@ li {
   flex: 1;
   display: flex;
   flex-direction: column;
+
 }
 
 .point-li span {

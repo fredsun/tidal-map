@@ -76,8 +76,9 @@ const toggleDrawer = () => {
   height: 100%;
   background-color: #fff;
   transition: transform 0.3s ease;
-  z-index: 1200;
+  z-index: 3;
   display: flex;
+  box-shadow:0 1px 2px rgba(60,64,67,0.3), 0 2px 6px 2px rgba(60,64,67,0.15);
 }
 
 
@@ -91,7 +92,8 @@ const toggleDrawer = () => {
   color: white;
   border: none;
   cursor: pointer;
-  z-index: 1200;
+  z-index: 2;
+  box-shadow:0 1px 2px rgba(60,64,67,0.3), 0 2px 6px 2px rgba(60,64,67,0.15);
   border-radius: 0 10px 10px 0;
   display: flex;
 }
