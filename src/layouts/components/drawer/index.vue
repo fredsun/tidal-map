@@ -5,16 +5,16 @@
 
       <slot></slot>
     </div>
-    <div @click="toggleDrawer" class="toggle-button">
-      <el-tooltip class="box-item" effect="dark"  :content="toggleButtonContent" placement="right">
+    <el-tooltip class="box-item" effect="dark" :content="toggleButtonContent" placement="right"  :auto-close="2000">
+      <div @click="toggleDrawer" class="toggle-button">
         <img src="@/assets/arrow_left_2x.png" :style="rightButtonStyle" class="drawerRightButtonImg">
-      </el-tooltip>
-    </div>
+      </div>
+    </el-tooltip>
   </div>
 </template>
     
 <script setup lang="ts">
-import { ref, reactive, computed,toRefs } from 'vue';
+import { ref, reactive, computed, toRefs } from 'vue';
 
 const drawerWidth = '100%';
 const isHidden = ref(false);
@@ -78,7 +78,7 @@ const toggleDrawer = () => {
   transition: transform 0.3s ease;
   z-index: 3;
   display: flex;
-  box-shadow:0 1px 2px rgba(60,64,67,0.3), 0 2px 6px 2px rgba(60,64,67,0.15);
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 2px 6px 2px rgba(60, 64, 67, 0.15);
 }
 
 
@@ -93,7 +93,7 @@ const toggleDrawer = () => {
   border: none;
   cursor: pointer;
   z-index: 2;
-  box-shadow:0 1px 2px rgba(60,64,67,0.3), 0 2px 6px 2px rgba(60,64,67,0.15);
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 2px 6px 2px rgba(60, 64, 67, 0.15);
   border-radius: 0 10px 10px 0;
   display: flex;
 }

@@ -87,6 +87,7 @@ export const GlobalStore = defineStore({
 					timesStamp: [],
 					tides: []
 				},
+				remark:"",
 			};
 			this.pointList.push(point);
 		},
@@ -107,6 +108,7 @@ export const GlobalStore = defineStore({
 					timesStamp: timesStampData,
 					tides: tidesData
 				},
+				remark:"",
 			};
 			this.pointList.push(point);
 			return point.mapId;

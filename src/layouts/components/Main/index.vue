@@ -4,7 +4,7 @@
       <div>
         <ul class="drawer-ul">
           <li v-for="item in items" :key="item.id">
-            <div class="drawer-li">
+            <div class="drawer-li" @click="handleMenuClick(item)" :class="selectedDrawerIndex == item.id? 'active' : '' ">
               <img :src="item.imageUrl" class="drawer-img" />
               <span class="drawer-li-title">{{ item.text }}</span>
             </div>
@@ -26,40 +26,92 @@
       </ul>
     </div>
     <div class="drawer-index">
-      <div class="drawer-index-header">
-        <div class="drawer-index-header-quert-hint">自定义</div>
-        <el-tooltip placement="bottom" :visible="tooltipVisible" effect="customized" content="请选择查询开始时间">
-          <div>
-            <el-date-picker class="el-date-picker-tidal" v-model="queryDateValue" type="datetime" placeholder="查询开始时间"
-              value-format="YYYY-MM-DD HH:mm:ss" style="width: 180px " height="50" />
-          </div>
-        </el-tooltip>
-        <div class="drawer-index-header-quert-hint">查询间隔:每</div>
-        <el-tooltip placement="bottom" :visible="tooltipIntervalVisible" effect="customized" content="请输入查询间隔">
-          <div>
-            <el-input v-model="input" placeholder="" clearable style="width:70px"
-              oninput="value=value.replace(/^\.+|[^\d.]/g,'')" />
-          </div>
-        </el-tooltip>
-        <div class="drawer-index-header-quert-hint">分钟</div>
-        <el-button type="primary" @click="handleHeaderClick()">批量查询</el-button>
-      </div>
-      <ul class="index-point-detail-ul">
-        <li v-for="point in points" :key="point.id">
-          <div class="index-point-detail-li">
-            <div class="index-point-bg">
-              <div class="index-point-title-bg">
-                <span class="index-point-text">{{ point.text }}</span>
-                <!-- <img class="index-point-img" :src="point.imageUrl" /> -->
-                <div class="index-point-storage" @click="handleItemClickStorage(point)">
-                  <span>{{ getStorageText(point) }}</span>
+      <div class="drawer-index-followed" v-if="isShowFollowedList">
+        <div @click="handleClickBackToQueryList()">
+          <img src="@/assets/arrow_back_grey800_24dp.png" />
+        </div>
+        <ul>
+          <template v-for="point in points">
+            <li v-if="point.storage == StorageKind.Stored">
+              <div>
+                <span>{{ point.text }}</span>
+                <span>{{ point.lat }}</span>
+                <span>{{ point.lng }}</span>
+                <div>
+                  <span @click="dialogFormVisible = true">新增备注: </span>
+                  <span>{{ point.remark }} </span>
+                  <el-dialog v-model="dialogFormVisible" title="新增备注">
+                    <el-form :model="form">
+                      <el-input v-model="point.remark" autocomplete="off" type="textarea" />
+                    </el-form>
+                    <template #footer>
+                      <span class="dialog-footer">
+                        <el-button @click="dialogFormVisible = false">取消</el-button>
+                        <el-button type="primary" @click="dialogFormVisible = false">
+                          完成
+                        </el-button>
+                      </span>
+                    </template>
+                  </el-dialog>
                 </div>
               </div>
-              <EchartItem class="index-point-echart" :chartData="point" :id="point.drawerId" />
+            </li>
+          </template>
+        </ul>
+      </div>
+      <div class="drawer-index-bg" v-if="isShowQueryList">
+        <div class="drawer-index-header">
+          <div class="drawer-index-header-quert-hint">自定义</div>
+          <el-tooltip placement="bottom" :visible="tooltipVisible" effect="customized" content="请选择查询开始时间">
+            <div>
+              <el-date-picker class="el-date-picker-tidal" v-model="queryDateValue" type="datetime" placeholder="查询开始时间"
+                value-format="YYYY-MM-DD HH:mm:ss" style="width: 180px " height="50" />
             </div>
-          </div>
-        </li>
-      </ul>
+          </el-tooltip>
+          <div class="drawer-index-header-quert-hint">查询间隔:每</div>
+          <el-tooltip placement="bottom" :visible="tooltipIntervalVisible" effect="customized" content="请输入查询间隔">
+            <div>
+              <el-input v-model="input" placeholder="" clearable style="width:70px"
+                oninput="value=value.replace(/^\.+|[^\d.]/g,'')" />
+            </div>
+          </el-tooltip>
+          <div class="drawer-index-header-quert-hint">分钟</div>
+          <el-button type="primary" @click="handleHeaderClick()">批量查询</el-button>
+        </div>
+        <ul class="index-point-detail-ul">
+          <li v-for="point in points" :key="point.id">
+            <div class="index-point-detail-li">
+              <div class="index-point-bg">
+                <div class="index-point-title-bg">
+                  <span class="index-point-text">{{ point.text }}</span>
+                  <!-- <img class="index-point-img" :src="point.imageUrl" /> -->
+                  <div class="index-point-storage" @click="handleItemClickStorage(point)">
+                    <span>{{ getStorageText(point) }}</span>
+                  </div>
+                </div>
+                <EchartItem class="index-point-echart" :chartData="point" :id="point.drawerId" />
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="drawer-index-history" v-if="isShowHistoryList">
+        <div @click="handleClickBackToQueryList()">
+          <img src="@/assets/arrow_back_grey800_24dp.png" />
+        </div>
+        <el-timeline>
+          <el-timeline-item 
+          v-for="point in points"
+          timestamp="2018/4/12" placement="top">
+            <el-card>
+              <h4>Update Github template</h4>
+              <p>Tom committed 2018/4/12 20:46</p>
+            </el-card>
+          </el-timeline-item>
+        </el-timeline>
+
+
+      </div>
     </div>
   </drawer>
   <Map ref="mapRef"></Map>
@@ -78,7 +130,16 @@ import { Tide, MultiTide } from '@/api/interface'
 
 import { getLngLatTideApi, getMultiTideApi } from "@/api/modules/tide";
 import { ElMessage } from 'element-plus'
-const isShowDrawer = false;
+const isShowQueryList = ref(true);
+const isShowFollowedList = ref(false);
+const isShowHistoryList = ref(false);
+const dialogFormVisible = ref(false);
+let selectedDrawerIndex = ref(0);
+const form = reactive({
+  name: '',
+})
+const formLabelWidth = "140px";
+
 function handleClose() {
   console.log("handleclose");
 }
@@ -172,6 +233,7 @@ function getStorageText(point: Point) {
   }
 }
 
+//关注按钮的点击
 function handleItemClickStorage(point: Point) {
   switch (point.storage) {
     case StorageKind.Empty:
@@ -194,6 +256,7 @@ const input = ref('');
 const tooltipVisible = ref(false);
 const tooltipIntervalVisible = ref(false);
 
+//顶部查询的点击
 function handleHeaderClick() {
   if (queryDateValue.value == "" || queryDateValue.value == null) {
     tooltipVisible.value = !tooltipVisible.value;
@@ -262,16 +325,42 @@ async function getMultiTide(_points: Point[], _date_bj: string, _interval_minute
       }
     })
   }
-
-  //  points.pop();
   console.log("points.length", points.length);
+}
 
-
+//左侧菜单的点击
+function handleMenuClick(_item: any) {
+  console.log("item", _item);
+  selectedDrawerIndex = _item.id;
+  switch (_item.id) {
+    case 1:
+      isShowQueryList.value = true;
+      isShowFollowedList.value = false;
+      isShowHistoryList.value = false;
+      break;
+    case 2:
+      isShowQueryList.value = false;
+      isShowFollowedList.value = true;
+      isShowHistoryList.value = false;
+      break;
+    case 3:
+      isShowQueryList.value = false;
+      isShowFollowedList.value = false;
+      isShowHistoryList.value = true;
+      break;
+    default:
+      break;
+  }
 
 }
 
 
-
+//顶部返回按钮
+function handleClickBackToQueryList() {
+  isShowQueryList.value = true;
+  isShowFollowedList.value = false;
+  isShowHistoryList.value = false;
+}
 
 </script>
 <style>
@@ -286,7 +375,7 @@ async function getMultiTide(_points: Point[], _date_bj: string, _interval_minute
 .drawer-route {
   display: flex;
   flex-direction: column;
-  box-shadow:0 1px 2px rgba(60,64,67,0.3), 0 2px 6px 2px rgba(60,64,67,0.15);
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 2px 6px 2px rgba(60, 64, 67, 0.15);
   z-index: 4;
 }
 
@@ -294,13 +383,31 @@ async function getMultiTide(_points: Point[], _date_bj: string, _interval_minute
 .point-li {
   height: 72px;
   width: 72px;
+  padding-top: 8px;
   margin-top: 8px;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center
+  align-items: center;
 }
+
+.drawer-li:hover,
+.point-li:hover {
+  background-color: #e1e3e5;
+}
+
+.drawer-li.active {
+  background-color: #e1e3e5;
+}
+
+.StyleSelectedBg{
+  background-color: #e1e3e5;
+}
+.StyleUnSelectedBg{
+  background-color:  #fff;
+}
+
 
 .drawer-img {
   width: 24px;
@@ -334,7 +441,6 @@ li {
   flex: 1;
   display: flex;
   flex-direction: column;
-
 }
 
 .point-li span {
@@ -430,9 +536,6 @@ li {
   align-items: center;
 }
 
-/* .el-date-picker-tidal {
-
-} */
 
 .el-popper.is-customized {
   /* Set padding to ensure the height is 32px */
@@ -445,21 +548,5 @@ li {
   right: 0;
 }
 
-/* element.style{
-  width: 20px;
-}
-.el-date-picker-bg {
-  width: 20px;
-}
 
-/* .el-input,
-  .el-select,
-  .el-date-editor {
-    width: 50px;
-    height: 200px;
-  }
-  .el-input__wrapper{
-    width:20px;
-  } */
-/* } */
 </style>

@@ -73,6 +73,7 @@ export interface Point{
     lng:number;
     lat:number;
     data:Tide.ResTideParams;
+    remark:string;
 }
 
 export enum StorageKind{
