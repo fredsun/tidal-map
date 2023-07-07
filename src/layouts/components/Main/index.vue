@@ -1,10 +1,11 @@
 <template>
   <drawer>
     <div class="drawer-route">
+      <!-- 左主菜单 -->
       <div>
-        <ul class="drawer-ul">
+        <ul class="drawer-route-ul">
           <li v-for="item in items" :key="item.id">
-            <div class="drawer-li" @click="handleMenuClick(item)" :class="selectedDrawerIndex == item.id? 'active' : '' ">
+            <div class="drawer-li" @click="handleMenuClick(item)" :class="selectedDrawerIndex == item.id ? 'active' : ''">
               <img :src="item.imageUrl" class="drawer-img" />
               <span class="drawer-li-title">{{ item.text }}</span>
             </div>
@@ -12,53 +13,68 @@
         </ul>
       </div>
       <div class="drawer-divider" />
-      <ul class="point-ul">
-        <li v-for="point in points" :key="point.id">
-          <div class="point-li" :class="{ active: point.active }" @mouseenter="handlePointEnter(point)"
-            @mouseleave="handlePointLeave(point)" @click="handlePointClick(point)">
-            <div class="point-img-bg">
-              <div class="point-img-border" :class="{ clicked: point.clicked }" />
-              <img :src="point.imageUrl" class="point-img" :class="{ clicked: point.clicked }" />
-            </div>
-            <span class="point-text" :class="{ clicked: point.clicked }">{{ point.text }}</span>
+      <!-- 左主点位list -->
+      <el-scrollbar class="point-ul">
+        <p v-for="point in points" :key="point.id">
+        <div class="point-li" :class="{ active: point.active }" @mouseenter="handlePointEnter(point)"
+          @mouseleave="handlePointLeave(point)" @click="handlePointClick(point)">
+          <div class="point-img-bg">
+            <div class="point-img-border" :class="{ clicked: point.clicked }" />
+            <img :src="point.imageUrl" class="point-img" :class="{ clicked: point.clicked }" />
           </div>
-        </li>
-      </ul>
+          <span class="point-text" :class="{ clicked: point.clicked }">{{ point.text }}</span>
+        </div>
+        </p>
+      </el-scrollbar>
     </div>
     <div class="drawer-index">
+      <!-- 已关注 -->
       <div class="drawer-index-followed" v-if="isShowFollowedList">
-        <div @click="handleClickBackToQueryList()">
-          <img src="@/assets/arrow_back_grey800_24dp.png" />
+        <div class="drawer-header-followed">
+          <div class="drawer-header-followed-arrow-bg" @click="handleClickBackToQueryList()">
+            <img class="drawer-header-followed-arrow" src="@/assets/arrow_back_grey800_24dp.png" />
+          </div>
+          <div class="drawer-header-followed-text-bg">
+            <div class="drawer-header-followed-text">
+              已关注的点位
+            </div>
+          </div>
         </div>
-        <ul>
+        <div class="drawer-header-followed-holder" v-if="showEmptyHolder(points)">
+          <div class="drawer-header-followed-holder-text">
+            暂无关注的点位
+          </div>
+        </div>
+        <el-scrollbar>
           <template v-for="point in points">
-            <li v-if="point.storage == StorageKind.Stored">
+            <p v-if="point.storage == StorageKind.Stored">
+            <div>
+              <span>{{ point.text }}</span>
+              <span>{{ point.lat }}</span>
+              <span>{{ point.lng }}</span>
               <div>
-                <span>{{ point.text }}</span>
-                <span>{{ point.lat }}</span>
-                <span>{{ point.lng }}</span>
-                <div>
-                  <span @click="dialogFormVisible = true">新增备注: </span>
-                  <span>{{ point.remark }} </span>
-                  <el-dialog v-model="dialogFormVisible" title="新增备注">
-                    <el-form :model="form">
-                      <el-input v-model="point.remark" autocomplete="off" type="textarea" />
-                    </el-form>
-                    <template #footer>
-                      <span class="dialog-footer">
-                        <el-button @click="dialogFormVisible = false">取消</el-button>
-                        <el-button type="primary" @click="dialogFormVisible = false">
-                          完成
-                        </el-button>
-                      </span>
-                    </template>
-                  </el-dialog>
-                </div>
+                <span @click="dialogFormVisible = true">新增备注: </span>
+                <span>{{ point.remark }} </span>
+                <el-dialog v-model="dialogFormVisible" title="新增备注">
+                  <el-form :model="form">
+                    <el-input v-model="point.remark" autocomplete="off" type="textarea" />
+                  </el-form>
+                  <template #footer>
+                    <span class="dialog-footer">
+                      <el-button @click="dialogFormVisible = false">取消</el-button>
+                      <el-button type="primary" @click="dialogFormVisible = false">
+                        完成
+                      </el-button>
+                    </span>
+                  </template>
+                </el-dialog>
               </div>
-            </li>
+            </div>
+            </p>
           </template>
-        </ul>
+        </el-scrollbar>
       </div>
+      <!-- 主界面 -->
       <div class="drawer-index-bg" v-if="isShowQueryList">
         <div class="drawer-index-header">
           <div class="drawer-index-header-quert-hint">自定义</div>
@@ -78,39 +94,38 @@
           <div class="drawer-index-header-quert-hint">分钟</div>
           <el-button type="primary" @click="handleHeaderClick()">批量查询</el-button>
         </div>
-        <ul class="index-point-detail-ul">
-          <li v-for="point in points" :key="point.id">
-            <div class="index-point-detail-li">
-              <div class="index-point-bg">
-                <div class="index-point-title-bg">
-                  <span class="index-point-text">{{ point.text }}</span>
-                  <!-- <img class="index-point-img" :src="point.imageUrl" /> -->
-                  <div class="index-point-storage" @click="handleItemClickStorage(point)">
-                    <span>{{ getStorageText(point) }}</span>
-                  </div>
+
+        <el-scrollbar class="index-point-detail-ul">
+          <p v-for="point in points" :key="point.id">
+          <div class="index-point-detail-li">
+            <div class="index-point-bg">
+              <div class="index-point-title-bg">
+                <span class="index-point-text">{{ point.text }}</span>
+                <!-- <img class="index-point-img" :src="point.imageUrl" /> -->
+                <div class="index-point-storage" @click="handleItemClickStorage(point)">
+                  <span>{{ getStorageText(point) }}</span>
                 </div>
-                <EchartItem class="index-point-echart" :chartData="point" :id="point.drawerId" />
               </div>
+              <EchartItem class="index-point-echart" :chartData="point" :id="point.drawerId" />
             </div>
-          </li>
-        </ul>
+          </div>
+          </p>
+        </el-scrollbar>
+
       </div>
+      <!-- 最近 -->
       <div class="drawer-index-history" v-if="isShowHistoryList">
         <div @click="handleClickBackToQueryList()">
           <img src="@/assets/arrow_back_grey800_24dp.png" />
         </div>
         <el-timeline>
-          <el-timeline-item 
-          v-for="point in points"
-          timestamp="2018/4/12" placement="top">
+          <el-timeline-item v-for="point in points" timestamp="2018/4/12" placement="top">
             <el-card>
               <h4>Update Github template</h4>
               <p>Tom committed 2018/4/12 20:46</p>
             </el-card>
           </el-timeline-item>
         </el-timeline>
-
-
       </div>
     </div>
   </drawer>
@@ -134,11 +149,20 @@ const isShowQueryList = ref(true);
 const isShowFollowedList = ref(false);
 const isShowHistoryList = ref(false);
 const dialogFormVisible = ref(false);
-let selectedDrawerIndex = ref(0);
+let selectedDrawerIndex = ref(1);
+function showEmptyHolder(_points: Point[]) {
+  let showEmptyHolder = true;
+  for (let index = 0; index < points.length; index++) {
+    const element = _points[index];
+    if (element.storage) {
+      showEmptyHolder = false;
+    }
+  }
+  return showEmptyHolder;
+};
 const form = reactive({
   name: '',
 })
-const formLabelWidth = "140px";
 
 function handleClose() {
   console.log("handleclose");
@@ -148,15 +172,10 @@ const items = reactive([
   { id: 2, text: '已关注', imageUrl: './src/assets/saved_filled_24px_grey_650.png' },
   { id: 3, text: '最近', imageUrl: './src/assets/gm_history_grey600_24dp.png' },
 ])
-
 const mapRef = ref();
-
-
-
 const points = reactive<Point[]>([
 
 ])
-
 
 //数据反推 point item 增加
 const globalStore = GlobalStore();
@@ -355,8 +374,9 @@ function handleMenuClick(_item: any) {
 }
 
 
-//顶部返回按钮
+//顶部返回按钮,重置状态
 function handleClickBackToQueryList() {
+  selectedDrawerIndex = ref(1);
   isShowQueryList.value = true;
   isShowFollowedList.value = false;
   isShowHistoryList.value = false;
@@ -364,12 +384,15 @@ function handleClickBackToQueryList() {
 
 </script>
 <style>
-.drawer-ul,
+.index-point-detail-ul,
+.drawer-route-ul,
 .point-ul,
 .index-point-detail-ul {
-  margin: 0;
-  overflow-x: hidden;
-  scrollbar-width: none;
+  overflow:auto;
+}
+
+.index-point-detail-ul {
+  height: calc(100vh - 10px);
 }
 
 .drawer-route {
@@ -384,14 +407,15 @@ function handleClickBackToQueryList() {
   height: 72px;
   width: 72px;
   padding-top: 8px;
-  margin-top: 8px;
-  margin-bottom: 8px;
+  margin-top: 2px;
+  margin-bottom: 2px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
+.drawer-header-followed-arrow-bg:hover,
 .drawer-li:hover,
 .point-li:hover {
   background-color: #e1e3e5;
@@ -401,13 +425,10 @@ function handleClickBackToQueryList() {
   background-color: #e1e3e5;
 }
 
-.StyleSelectedBg{
-  background-color: #e1e3e5;
+.index-point-detail-li:hover,
+.drawer-header-followed-holder-text:hover {
+  background-color: #f5f7fa;
 }
-.StyleUnSelectedBg{
-  background-color:  #fff;
-}
-
 
 .drawer-img {
   width: 24px;
@@ -498,7 +519,7 @@ li {
 }
 
 .index-point-echart {
-  width: 300px;
+  width: 500px;
   height: 200px;
 }
 
@@ -548,5 +569,64 @@ li {
   right: 0;
 }
 
+.drawer-index-followed {
+  background-color: #fff;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 
+.drawer-header-followed {
+  display: flex;
+  flex-direction: row;
+  height: 84.2px;
+}
+
+.drawer-header-followed-arrow-bg {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-right: 16px;
+  padding-left: 24px;
+}
+
+.drawer-header-followed-arrow {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+}
+
+.drawer-header-followed-text {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  padding-left: 5%;
+}
+
+.drawer-header-followed-text-bg {
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+.drawer-header-followed-holder {
+  height: 100%;
+  width: 100%;
+}
+
+.drawer-header-followed-holder-text {
+  height: 100%;
+  width: 100%;
+  padding-top: 200px;
+  text-align: center;
+}
+
+.drawer-index-bg {
+  /* overflow: hidden; */
+  /* 固定高度头+剩余的部分填充解决 */
+  /* display: flex;
+  flex-direction: column; */
+  display: block;
+  overflow: hidden;
+}
 </style>

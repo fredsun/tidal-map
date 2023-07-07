@@ -40,7 +40,7 @@ const option = {
     series: [
         {
             name: '高度/米',
-            type: 'bar',
+            type: 'line',
             data: props.chartData?.data.tides
         }
     ]
@@ -83,7 +83,7 @@ function updateChart(params: Point) {
         series: [
             {
                 name: '高度/米',
-                type: 'bar',
+                type: 'line',
                 data: props.chartData?.data.tides
             }
         ]
