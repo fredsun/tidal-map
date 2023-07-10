@@ -42,10 +42,11 @@
         </div>
         <div class="drawer-header-followed-holder" v-if="showEmptyHolder(points)">
           <div class="drawer-header-followed-holder-text">
+            
             暂无关注的点位
           </div>
         </div>
-        <el-scrollbar>
+        <el-scrollbar v-if="isShowFollowedList && hasStoredPoints">
           <template v-for="point in points">
             <p v-if="point.storage == StorageKind.Stored">
             <div>
@@ -374,6 +375,8 @@ function handleMenuClick(_item: any) {
 }
 
 
+
+
 //顶部返回按钮,重置状态
 function handleClickBackToQueryList() {
   selectedDrawerIndex = ref(1);
@@ -381,6 +384,10 @@ function handleClickBackToQueryList() {
   isShowFollowedList.value = false;
   isShowHistoryList.value = false;
 }
+
+const hasStoredPoints = computed(() => {
+  return points.some(point => point.storage === StorageKind.Stored);
+});
 
 </script>
 <style>
@@ -579,14 +586,16 @@ li {
 .drawer-header-followed {
   display: flex;
   flex-direction: row;
-  height: 84.2px;
+  height: 70px;
 }
 
 .drawer-header-followed-arrow-bg {
-  padding-top: 20px;
-  padding-bottom: 20px;
-  padding-right: 16px;
-  padding-left: 24px;
+ height:100%;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ padding-left: 20px;
+ padding-right: 20px;
 }
 
 .drawer-header-followed-arrow {
@@ -601,12 +610,12 @@ li {
   display: flex;
   justify-content: left;
   align-items: center;
-  padding-left: 5%;
+  padding-left: 10px;
 }
 
 .drawer-header-followed-text-bg {
-  width: 100%;
-  flex: 0 0 auto;
+  height: 70px;
+
 }
 
 .drawer-header-followed-holder {
