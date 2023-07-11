@@ -36,26 +36,35 @@
           </div>
           <div class="drawer-header-followed-text-bg">
             <div class="drawer-header-followed-text">
-              已关注的点位
+              <div class="drawer-header-followed-text-title">已关注的点位</div>
+              <div class="drawer-header-followed-text-points">{{ points.length }}个点位</div>
+            </div>
+            <div v-if="isShowFollowedList && hasStoredPoints">
+
             </div>
           </div>
         </div>
         <div class="drawer-header-followed-holder" v-if="showEmptyHolder(points)">
           <div class="drawer-header-followed-holder-text">
-            
             暂无关注的点位
           </div>
         </div>
         <el-scrollbar v-if="isShowFollowedList && hasStoredPoints">
           <template v-for="point in points">
             <p v-if="point.storage == StorageKind.Stored">
-            <div>
-              <span>{{ point.text }}</span>
-              <span>{{ point.lat }}</span>
-              <span>{{ point.lng }}</span>
-              <div>
-                <span @click="dialogFormVisible = true">新增备注: </span>
-                <span>{{ point.remark }} </span>
+            <div class="index-point-followed-li-bg">
+              <div class="index-point-followed-li" @click="handleItemClickPointFollowed(point)">
+                <div class="index-point-followed-li-text">
+                  <div class="index-point-followed-li-title">{{ point.text }}</div>
+                  <div class="index-point-followed-li-num">坐标: {{ point.lat }} {{ point.lng }}</div>
+                </div>
+                <img class="index-point-followed-li-img" src="@/assets/temp_point.jpg" />
+              </div>
+              <div class="index-point-followed-li-remark">
+                <div class="index-point-followed-li-remark-title-bg" @click="dialogFormVisible = true">
+                  <div class="index-point-followed-li-remark-title">新增备注:</div>
+                </div>
+                <div>{{ point.remark }} </div>
                 <el-dialog v-model="dialogFormVisible" title="新增备注">
                   <el-form :model="form">
                     <el-input v-model="point.remark" autocomplete="off" type="textarea" />
@@ -70,6 +79,8 @@
                   </template>
                 </el-dialog>
               </div>
+
+              <el-divider></el-divider>
             </div>
             </p>
           </template>
@@ -389,13 +400,17 @@ const hasStoredPoints = computed(() => {
   return points.some(point => point.storage === StorageKind.Stored);
 });
 
+//已关注点位点击后地图对应偏移
+function handleItemClickPointFollowed(_point: Point) {
+  mapRef.value.moveToFocusPoint(_point);
+}
 </script>
 <style>
 .index-point-detail-ul,
 .drawer-route-ul,
 .point-ul,
 .index-point-detail-ul {
-  overflow:auto;
+  overflow: auto;
 }
 
 .index-point-detail-ul {
@@ -432,9 +447,35 @@ const hasStoredPoints = computed(() => {
   background-color: #e1e3e5;
 }
 
+.index-point-followed-li:hover,
 .index-point-detail-li:hover,
 .drawer-header-followed-holder-text:hover {
   background-color: #f5f7fa;
+}
+
+.index-point-followed-li:hover {
+  cursor: pointer;
+}
+
+.index-point-followed-li-text {
+  height: 108px;
+  align-items: flex-start;
+  justify-content: left;
+  display: inline-block;
+  flex-direction: column;
+  padding-left: 20px;
+  padding-top: 10px;
+  flex: 1;
+}
+
+.index-point-followed-li-bg {
+  display: block;
+}
+
+.index-point-followed-li {
+  height: 80px;
+  display: flex;
+  padding: 10px 18px 10px 24px;
 }
 
 .drawer-img {
@@ -522,7 +563,6 @@ li {
 .index-point-detail-li {
   width: 100%;
   height: 300px;
-
 }
 
 .index-point-echart {
@@ -537,6 +577,22 @@ li {
 
 .index-point-storage {
   width: 50px;
+}
+
+.index-point-followed-li-remark-title {
+  color: #1a73e8;
+  padding-left: 40px;
+  padding-right: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-weight: 500;
+  font-size: 0.875em;
+  font-family: "Google Sans", Roboto, "Noto Sans TC", Arial, sans-serif;
+}
+
+.index-point-followed-li-remark-title-bg:hover {
+  background-color: rgba(177, 205, 241, 0.1);
+  cursor: pointer;
 }
 
 .drawer-li-title {
@@ -590,12 +646,12 @@ li {
 }
 
 .drawer-header-followed-arrow-bg {
- height:100%;
- display: flex;
- justify-content: center;
- align-items: center;
- padding-left: 20px;
- padding-right: 20px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 .drawer-header-followed-arrow {
@@ -608,14 +664,55 @@ li {
   width: 100%;
   height: 100%;
   display: flex;
-  justify-content: left;
-  align-items: center;
+  justify-content: center;
+  align-items: start;
   padding-left: 10px;
+  flex-direction: column;
+  text-align: center;
 }
 
 .drawer-header-followed-text-bg {
   height: 70px;
+}
 
+.index-point-followed-li-title {
+  font-size: 15px;
+  color: #202124;
+  font-weight: 500;
+  text-align: left;
+}
+
+.index-point-followed-li-num {
+  margin-top: 20px;
+  font-size: 13px;
+  color: #70757a;
+  text-align: left;
+}
+
+.index-point-followed-li-remark {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: row;
+
+}
+
+.index-point-followed-li-img {
+
+  position: relative;
+  height: 80px;
+  width: 80px;
+  margin-left: 10px;
+  border-radius: 8px;
+  background-position: 50% 50%;
+}
+
+.drawer-header-followed-text-title {
+  font-weight: 900;
+  font-size: 20px;
+}
+
+.drawer-header-followed-text-points {
+  font-size: 8px;
 }
 
 .drawer-header-followed-holder {
