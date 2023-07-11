@@ -3,6 +3,7 @@ import { GlobalState, ThemeConfigProps, AssemblySizeType, Point, StorageKind } f
 import { DEFAULT_PRIMARY } from "@/config/config";
 import piniaPersistConfig from "@/config/piniaPersist";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
+import { fa } from "element-plus/es/locale";
 
 
 // defineStore 调用后返回一个函数，调用该函数获得 Store 实体
@@ -88,6 +89,7 @@ export const GlobalStore = defineStore({
 					tides: []
 				},
 				remark:"",
+				dialogVisible:false,
 			};
 			this.pointList.push(point);
 		},
@@ -109,6 +111,7 @@ export const GlobalStore = defineStore({
 					tides: tidesData
 				},
 				remark:"",
+				dialogVisible:false,
 			};
 			this.pointList.push(point);
 			return point.mapId;

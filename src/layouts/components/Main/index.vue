@@ -61,18 +61,19 @@
                 <img class="index-point-followed-li-img" src="@/assets/temp_point.jpg" />
               </div>
               <div class="index-point-followed-li-remark">
-                <div class="index-point-followed-li-remark-title-bg" @click="dialogFormVisible = true">
+                <div class="index-point-followed-li-remark-text">{{ point.remark }} </div>
+                <div class="index-point-followed-li-remark-title-bg" @click="handleItemClickPointFollowedRemark(point)">
                   <div class="index-point-followed-li-remark-title">新增备注:</div>
                 </div>
-                <div>{{ point.remark }} </div>
-                <el-dialog v-model="dialogFormVisible" title="新增备注">
+
+                <el-dialog v-model="point.dialogVisible" title="新增备注">
                   <el-form :model="form">
                     <el-input v-model="point.remark" autocomplete="off" type="textarea" />
                   </el-form>
                   <template #footer>
                     <span class="dialog-footer">
-                      <el-button @click="dialogFormVisible = false">取消</el-button>
-                      <el-button type="primary" @click="dialogFormVisible = false">
+                      <el-button @click="point.dialogVisible = false">取消</el-button>
+                      <el-button type="primary" @click="point.dialogVisible = false">
                         完成
                       </el-button>
                     </span>
@@ -385,9 +386,6 @@ function handleMenuClick(_item: any) {
 
 }
 
-
-
-
 //顶部返回按钮,重置状态
 function handleClickBackToQueryList() {
   selectedDrawerIndex = ref(1);
@@ -403,6 +401,10 @@ const hasStoredPoints = computed(() => {
 //已关注点位点击后地图对应偏移
 function handleItemClickPointFollowed(_point: Point) {
   mapRef.value.moveToFocusPoint(_point);
+}
+
+function handleItemClickPointFollowedRemark(_point: Point) {
+  _point.dialogVisible = true;
 }
 </script>
 <style>
@@ -585,14 +587,18 @@ li {
   padding-right: 20px;
   padding-top: 10px;
   padding-bottom: 10px;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.875em;
-  font-family: "Google Sans", Roboto, "Noto Sans TC", Arial, sans-serif;
 }
 
 .index-point-followed-li-remark-title-bg:hover {
   background-color: rgba(177, 205, 241, 0.1);
   cursor: pointer;
+}
+
+.index-point-followed-li-remark-text {
+  padding-top: 10px;
+  padding-left: 40px;
 }
 
 .drawer-li-title {
@@ -691,8 +697,8 @@ li {
 
 .index-point-followed-li-remark {
   display: flex;
-  align-items: flex-start;
-  flex-direction: row;
+  align-items: start;
+  flex-direction: column;
 
 }
 

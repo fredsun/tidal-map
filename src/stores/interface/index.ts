@@ -74,6 +74,7 @@ export interface Point{
     lat:number;
     data:Tide.ResTideParams;
     remark:string;
+    dialogVisible:boolean;
 }
 
 export enum StorageKind{
