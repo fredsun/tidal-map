@@ -126,19 +126,35 @@
         </el-scrollbar>
 
       </div>
-      <!-- 最近 -->
+      <!-- 历史查询 -->
       <div class="drawer-index-history" v-if="isShowHistoryList">
-        <div @click="handleClickBackToQueryList()">
-          <img src="@/assets/arrow_back_grey800_24dp.png" />
+        <div class="drawer-header-history">
+          <div class="drawer-header-history-arrow-bg" @click="handleClickBackToQueryList()">
+            <img class="drawer-header-history-arrow" src="@/assets/arrow_back_grey800_24dp.png" />
+          </div>
+          <div class="drawer-header-history-text-bg">
+            <div class="drawer-header-history-text">
+              <div class="drawer-header-history-text-title">历史查询</div>
+            </div>
+            <div v-if="isShowFollowedList && hasStoredPoints">
+            </div>
+          </div>
         </div>
-        <el-timeline>
-          <el-timeline-item v-for="point in points" timestamp="2018/4/12" placement="top">
-            <el-card>
-              <h4>Update Github template</h4>
-              <p>Tom committed 2018/4/12 20:46</p>
-            </el-card>
-          </el-timeline-item>
-        </el-timeline>
+        <el-scrollbar class="index-point-detail-ul">
+          <template v-for="point in points">
+            <div class="index-point-history-li">
+              <img class="index-point-history-li-img" src="@/assets/temp_point.jpg" />
+              <div class="index-point-history-li-text-bg">
+                <div class="index-point-history-li-title">
+                  title
+                </div>
+                <div class="index-point-history-li-time">
+                  time
+                </div>
+              </div>
+            </div>
+          </template>
+        </el-scrollbar>
       </div>
     </div>
   </drawer>
@@ -183,7 +199,7 @@ function handleClose() {
 const items = reactive([
   { id: 1, text: '', imageUrl: './src/assets/gm_menu_gm_grey600_24dp.png' },
   { id: 2, text: '已关注', imageUrl: './src/assets/saved_filled_24px_grey_650.png' },
-  { id: 3, text: '最近', imageUrl: './src/assets/gm_history_grey600_24dp.png' },
+  { id: 3, text: '历史查询', imageUrl: './src/assets/gm_history_grey600_24dp.png' },
 ])
 const mapRef = ref();
 const points = reactive<Point[]>([
@@ -449,16 +465,19 @@ function handleItemClickPointFollowedRemark(_point: Point) {
   background-color: #e1e3e5;
 }
 
+.index-point-history-li:hover,
 .index-point-followed-li:hover,
 .index-point-detail-li:hover,
 .drawer-header-followed-holder-text:hover {
   background-color: #f5f7fa;
 }
 
+.index-point-history-li:hover,
 .index-point-followed-li:hover {
   cursor: pointer;
 }
 
+.index-point-history-li-text-bg,
 .index-point-followed-li-text {
   height: 108px;
   align-items: flex-start;
@@ -645,12 +664,14 @@ li {
   flex-direction: column;
 }
 
+.drawer-header-history,
 .drawer-header-followed {
   display: flex;
   flex-direction: row;
   height: 70px;
 }
 
+.drawer-header-history-arrow-bg,
 .drawer-header-followed-arrow-bg {
   height: 100%;
   display: flex;
@@ -660,12 +681,14 @@ li {
   padding-right: 20px;
 }
 
+.drawer-header-history-arrow,
 .drawer-header-followed-arrow {
   width: 24px;
   height: 24px;
   flex: 0 0 auto;
 }
 
+.drawer-header-history-text,
 .drawer-header-followed-text {
   width: 100%;
   height: 100%;
@@ -677,10 +700,12 @@ li {
   text-align: center;
 }
 
+.drawer-header-history-text-bg,
 .drawer-header-followed-text-bg {
   height: 70px;
 }
 
+.index-point-history-li-title,
 .index-point-followed-li-title {
   font-size: 15px;
   color: #202124;
@@ -688,6 +713,7 @@ li {
   text-align: left;
 }
 
+.index-point-history-li-time,
 .index-point-followed-li-num {
   margin-top: 20px;
   font-size: 13px;
@@ -702,6 +728,7 @@ li {
 
 }
 
+.index-point-history-li-img,
 .index-point-followed-li-img {
 
   position: relative;
@@ -740,5 +767,14 @@ li {
   flex-direction: column; */
   display: block;
   overflow: hidden;
+}
+
+.drawer-index-history {
+  display: flex;
+  flex-direction: column;
+}
+.index-point-history-li{
+  display: flex;
+  padding-left: 20px;
 }
 </style>
